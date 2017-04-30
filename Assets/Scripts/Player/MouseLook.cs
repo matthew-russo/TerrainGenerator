@@ -22,7 +22,7 @@ public class MouseLook : MonoBehaviour
 
     void Update ()
     {
-        if (!UIManager.Instance.isPaused)
+        if (!UIManager.Instance.isPaused && !TerrainManager.Instance.showLoading)
         {
             // 1. Get mouse input data
             //

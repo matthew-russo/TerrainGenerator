@@ -18,7 +18,7 @@ public class ControllerMove : MonoBehaviour
 
     void Update ()
     {
-        if (!UIManager.Instance.isPaused)
+        if (!UIManager.Instance.isPaused && !TerrainManager.Instance.showLoading)
         {
             // 1. Grab input from input devices
             float horizontal = Input.GetAxis("Horizontal"); // Left and Right movement
