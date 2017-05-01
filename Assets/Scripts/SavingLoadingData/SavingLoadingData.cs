@@ -22,6 +22,13 @@ public class SavingLoadingData : MonoBehaviour
         path = Application.streamingAssetsPath;
 
         LoadInitialData();
+
+        Debug.Log(savesList.Count);
+
+        foreach (SaveDataModel saveFile in savesList)
+        {
+            Debug.Log(saveFile.name);
+        }
     }
 
     public void Save()
@@ -98,12 +105,15 @@ public class SavingLoadingData : MonoBehaviour
                 // SaveNewTerrain reference to rearrange list
                 SaveDataModel saveFileToRearrange = savesList[savesList.Count - i - 1];
 
+                // Rearrange List
                 savesList.Remove(saveFileToRearrange);
                 savesQueue = new Queue<SaveDataModel>(savesList);
                 savesQueue.Enqueue(saveFileToRearrange);
 
+                // Update Menu
                 UIManager.Instance.UpdateToggles();
 
+                // Start Loading Routine
                 TerrainManager.Instance.showLoading = true;
                 TerrainManager.Instance.timeToBreak = true;
                 TerrainManager.Instance.randXOffset = saveFileToRearrange.xSeed;

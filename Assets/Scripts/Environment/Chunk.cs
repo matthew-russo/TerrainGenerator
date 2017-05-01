@@ -9,8 +9,8 @@ using Random = UnityEngine.Random;
 /// Decides which texture to use for each block
 /// 
 /// THIS USES A MODIFIED VERSION OF SCRIPTS PRESENTED HERE: http://alexstv.com/index.php/posts/unity-voxel-block-tutorial
-/// Previously I was instantiating cubes which has horrific performance as expected and this seemed to be a good solution that fit my needs
-/// without being total overkill. My first notion was to write a shader and push all the computation to the GPU  and would like to eventually get to that
+/// Previously I was instantiating cubes which has horrific performance and this seemed to be a good solution that fit my needs
+/// without being total overkill. My first notion was to write a compute/geometry shader and push all the computation to the GPU and would like to eventually get to that
 /// but wasn't in the scope of this assignment. 
 /// 
 /// Essentially this creates a set of Blocks that send vertex data to a MeshData class which compiles all the blocks 
@@ -125,7 +125,7 @@ public class Chunk : MonoBehaviour
         localZOrigin = z;
     }
 
-    // returns a block at the given indices WITHIN this chunk only
+    // Returns a block at the given indices WITHIN this chunk only
     //
     public Block GetBlock(int x, int z)
     {

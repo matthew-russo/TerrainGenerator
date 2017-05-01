@@ -6,38 +6,56 @@ public class Block {
     //Base block constructor
     public Block() { }
 
+    // TODO: Fix weird bug where the 16th row and column don't properly show south and east face
+    //
+    // This is where it determines what faces to show. We only show the ones that the player could potentionally see
+    // Always show the top face, never show the bottom face
+    // The sides that are shown are determined by whether the neighboring block is higher or not.
+    //
+    // NEEDS TO BE REFACTORED. JUST CHANGED THIS TODAY
+    //
     public virtual MeshData Blockdata (Chunk chunk, int x, float y, int z, MeshData meshData)
     {
         meshData.useRenderDataForCol = true;
-        //if (!chunk.GetBlock(x, z).IsSolid(Direction.down))
-        //{
-            meshData = FaceDataUp(chunk, x, y, z, meshData);
-        //}
 
-        //if (!chunk.GetBlock(x, z).IsSolid(Direction.up))
-        //{
-            //meshData = FaceDataDown(chunk, x, y, z, meshData);
-        //}
+        meshData = FaceDataUp(chunk, x, y, z, meshData);
 
-        //if (z < 15 && !chunk.GetBlock(x, z + 1).IsSolid(Direction.south))
-        //{
-            meshData = FaceDataNorth(chunk, x, y, z, meshData);
-        //}
+        //Debug.Log("X: " + x + ", Z: " + z);
 
-        //if (z > 0 && !chunk.GetBlock(x, z - 1).IsSolid(Direction.north))
-        //{
+        if (z < TerrainManager.CHUNK_SIZE * TerrainManager.GRID_SIZE - 1 && TerrainManager.Instance.GlobalHeightMap[x, z + 1] > y) {
             meshData = FaceDataSouth(chunk, x, y, z, meshData);
-        //}
+        }
+        else if (z >= TerrainManager.CHUNK_SIZE * TerrainManager.GRID_SIZE - 1)
+        {
+            meshData = FaceDataSouth(chunk, x, y, z, meshData);
+        }
 
-        //if (x < 15 && !chunk.GetBlock(x + 1, z).IsSolid(Direction.west))
-        //{
-            meshData = FaceDataEast(chunk, x, y, z, meshData);
-        //}
+        if (z > 0 && TerrainManager.Instance.GlobalHeightMap[x, z - 1] > y)
+        {
+            meshData = FaceDataNorth(chunk, x, y, z, meshData);
+        }
+        else if (z <= 0)
+        {
+            meshData = FaceDataNorth(chunk, x, y, z, meshData);
+        }
 
-        //if (x > 0 && !chunk.GetBlock(x - 1, z).IsSolid(Direction.east))
-        //{
+        if (x < TerrainManager.CHUNK_SIZE * TerrainManager.GRID_SIZE - 1 && TerrainManager.Instance.GlobalHeightMap[x + 1, z] > y)
+        {
             meshData = FaceDataWest(chunk, x, y, z, meshData);
-        //}
+        }
+        else if (x >= TerrainManager.CHUNK_SIZE * TerrainManager.GRID_SIZE - 1)
+        {
+            meshData = FaceDataWest(chunk, x, y, z, meshData);
+        }
+
+        if (x > 0 && TerrainManager.Instance.GlobalHeightMap[x - 1, z] > y)
+        {
+            meshData = FaceDataEast(chunk, x, y, z, meshData);
+        }
+        else if (x <= 0)
+        {
+            meshData = FaceDataEast(chunk, x, y, z, meshData);
+        }
 
         return meshData;
     }

@@ -18,10 +18,12 @@ public class UIManager : Singleton<UIManager>
     void Start()
     {
         savingLoadingDataScript = GetComponent<SavingLoadingData>();
-        for (int i = 0; i < toggles.Length; ++i)
+        savingLoadingDataScript.LoadInitialData();
+
+        for (int i = 0; i < savingLoadingDataScript.savesQueue.Count; ++i)
         {
-            toggles[i].isOn = false;
-            toggles[i].GetComponentInChildren<Text>().text = savingLoadingDataScript.savesQueue.ElementAt(toggles.Length-i-1).name;
+            toggles[toggles.Length - i - 1].isOn = false;
+            toggles[toggles.Length - i - 1].GetComponentInChildren<Text>().text = savingLoadingDataScript.savesQueue.ElementAt(i).name;
         }
     }
 
