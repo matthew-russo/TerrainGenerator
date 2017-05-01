@@ -89,9 +89,7 @@ public class SavingLoadingData : MonoBehaviour
         savesQueue = new Queue<SaveDataModel>(savesList);
         stream.Close();
 
-        // Loops through the toggles to find which one is on
-        // Once it finds the selected one it loops through the save files to see which one's name matches the selected one.
-        // This is also sort of janky and I want to refactor it to just work off of indices. ie toggle 4 = save file 4.
+        // Loops through the toggles to find which one is on and then loads the corresponding save file. (Reverse indices ie: 0 = 5, 1 = 4, etc.)
         //
         for (int i = 0; i < UIManager.Instance.toggles.Length; ++i)
         { 
