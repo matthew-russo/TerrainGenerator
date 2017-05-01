@@ -20,11 +20,22 @@ public class SavingLoadingData : MonoBehaviour
     private void Awake()
     {
         path = Application.streamingAssetsPath;
+
+        LoadInitialData();
+    }
+
+    public void Save()
+    {
+        string filePath = Path.Combine(path, file);
+        FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate);
+        BinaryFormatter bf = new BinaryFormatter();
+        bf.Serialize(fs, savesList);
+        fs.Close();
     }
 
     // Saves the current terrain as the name the player gives it in the input field
     //
-    public void Save()
+    public void SaveNewTerrain()
     {
         string filePath = Path.Combine(path, file);
 
@@ -42,16 +53,19 @@ public class SavingLoadingData : MonoBehaviour
                                                         TerrainManager.Instance.randXOffset, 
                                                         TerrainManager.Instance.randYOffset);
 
+        // Add new save to the list
         // If the list of save files is greater than 5, it gets rid of the oldest one.
-        // Then it adds the new save onto the lsit.
         //
+        savesQueue.Enqueue(newSave);
         if (savesQueue.Count > 5)
         {
             savesQueue.Dequeue();
         }
-        savesQueue.Enqueue(newSave);
 
-        // Save Data
+        Debug.Log(savesQueue.Count);
+
+
+        // SaveNewTerrain Data
         savesList = new List<SaveDataModel>(savesQueue);
         FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate);
         BinaryFormatter bf = new BinaryFormatter();
@@ -79,32 +93,39 @@ public class SavingLoadingData : MonoBehaviour
         // Once it finds the selected one it loops through the save files to see which one's name matches the selected one.
         // This is also sort of janky and I want to refactor it to just work off of indices. ie toggle 4 = save file 4.
         //
-        foreach(Toggle option in UIManager.Instance.toggles)
-        {
-            if (option.isOn)
+        for (int i = 0; i < UIManager.Instance.toggles.Length; ++i)
+        { 
+            if (UIManager.Instance.toggles[i].isOn)
             {
-                foreach (SaveDataModel saveFile in savesList)
+                // SaveNewTerrain reference to rearrange list
+                SaveDataModel saveFileToRearrange = savesList[savesList.Count - i - 1];
+
+                savesList.Remove(saveFileToRearrange);
+                savesQueue = new Queue<SaveDataModel>(savesList);
+                savesQueue.Enqueue(saveFileToRearrange);
+
+                UIManager.Instance.UpdateToggles();
+
+                TerrainManager.Instance.showLoading = true;
+                TerrainManager.Instance.timeToBreak = true;
+                TerrainManager.Instance.randXOffset = saveFileToRearrange.xSeed;
+                TerrainManager.Instance.randYOffset = saveFileToRearrange.ySeed;
+                foreach (Transform child in TerrainManager.Instance.transform)
                 {
-                    // Shows loading screen, breaks out of any previous generation, set the proper seed, destroy all previous chunks, start generation and reset player position
-                    //
-                    if (saveFile.name == option.GetComponentInChildren<Text>().text)
-                    {
-                        TerrainManager.Instance.showLoading = true;
-                        TerrainManager.Instance.timeToBreak = true;
-                        TerrainManager.Instance.randXOffset = saveFile.xSeed;
-                        TerrainManager.Instance.randYOffset = saveFile.ySeed;
-                        foreach (Transform child in TerrainManager.Instance.transform)
-                        {
-                            Destroy(child.gameObject);
-                        }
-                        StartCoroutine(DelayRestartGeneration());
-                        //GameObject.FindGameObjectWithTag("Player").transform.position = new Vector3(saveFile.playerPosition.x, saveFile.playerPosition.y + 10f, saveFile.playerPosition.z);
-                        GameObject.FindGameObjectWithTag("Player").transform.position = new Vector3(10, 300, 10);
-                        GameObject.FindGameObjectWithTag("Player").transform.eulerAngles = new Vector3(0, 45, 0);
-                    }
+                    Destroy(child.gameObject);
                 }
+                StartCoroutine(DelayRestartGeneration());
+                //GameObject.FindGameObjectWithTag("Player").transform.position = new Vector3(saveFile.playerPosition.x, saveFile.playerPosition.y + 10f, saveFile.playerPosition.z);
+                GameObject.FindGameObjectWithTag("Player").transform.position = new Vector3(10, 300, 10);
+                GameObject.FindGameObjectWithTag("Player").transform.eulerAngles = new Vector3(0, 45, 0);
             }
         }
+
+        stream = new FileStream(filePath, FileMode.OpenOrCreate);
+        bf = new BinaryFormatter();
+        bf.Serialize(stream, savesList);
+        stream.Close();
+
         Time.timeScale = 1f;
     }
 
