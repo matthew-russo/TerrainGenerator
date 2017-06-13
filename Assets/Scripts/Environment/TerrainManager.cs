@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 
 public class TerrainManager : Singleton<TerrainManager> {
-    public const int GRID_SIZE = 64; // How many chunks there will be in each direction
+    public const int GRID_SIZE = 58; // How many chunks there will be in each direction
     public const int CHUNK_SIZE = 16; // How many blocks each chunk has
 
     public float[,] GlobalHeightMap;
